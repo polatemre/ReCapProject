@@ -1,0 +1,6 @@
+﻿ALTER TABLE dbo.Customers
+   ADD CONSTRAINT FK_UserId_23123123 FOREIGN KEY (UserId)
+      REFERENCES dbo.Users (Id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+;

@@ -1,5 +1,7 @@
-﻿using DataAccess.Abstract;
+﻿using Core.DataAccess.EntityFramework;
+using DataAccess.Abstract;
 using Entities.Concrete;
+using Entities.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,49 +11,25 @@ using System.Text;
 
 namespace DataAccess.Concrete.EntityFramework
 {
-    public class EfCarDal : ICarDal
+    public class EfCarDal : EfEntityRepositoryBase<Car, ReCapContext>, ICarDal
     {
-        public void Add(Car entity)
-        {
-            using ReCapContext context = new ReCapContext(); //using bitince bellekten silinir. Performans için yapılır.
-            if (entity.Description.Length >= 2 && entity.DailyPrice > 0)
-            {
-                var addedEntity = context.Entry(entity); //Veri kaynağından nesneyi eşleştir, referansı yakala.
-                addedEntity.State = EntityState.Added; //Ne yapacağını belirtiyoruz.
-                context.SaveChanges(); //İşlemi yap.
-            }
-        }
-
-        public void Delete(Car entity)
-        {
-            using ReCapContext context = new ReCapContext(); //using bitince bellekten silinir. Performans için yapılır.
-            var deletedEntity = context.Entry(entity); //Veri kaynağından nesneyi eşleştir, referansı yakala.
-            deletedEntity.State = EntityState.Deleted; //Ne yapacağını belirtiyoruz.
-            context.SaveChanges(); //İşlemi yap.
-        }
-
-        public Car Get(Expression<Func<Car, bool>> filter)
+        public List<CarDetailDto> GetCarDetails()
         {
             using ReCapContext context = new ReCapContext();
-            return context.Set<Car>().SingleOrDefault(filter);
-        }
-
-        public List<Car> GetAll(Expression<Func<Car, bool>> filter = null)
-        {
-            using ReCapContext context = new ReCapContext();
-            //tablodaki bütün sütunları getirir.
-            //Filtre null ise product tablosunun tamamı select * from product. Null değilse filtreyi uygular.
-            return filter == null
-                ? context.Set<Car>().ToList()
-                : context.Set<Car>().Where(filter).ToList();
-        }
-
-        public void Update(Car entity)
-        {
-            using ReCapContext context = new ReCapContext(); //using bitince bellekten silinir. Performans için yapılır.
-            var updatedEntity = context.Entry(entity); //Veri kaynağından nesneyi eşleştir, referansı yakala.
-            updatedEntity.State = EntityState.Modified; //Ne yapacağını belirtiyoruz.
-            context.SaveChanges(); //İşlemi yap.
+            var result = from ca in context.Cars
+                         join b in context.Brands
+                         on ca.BrandId equals b.Id
+                         join co in context.Colors
+                         on ca.ColorId equals co.Id
+                         select new CarDetailDto
+                         {
+                             CarId = ca.Id,
+                             CarName = ca.Description,
+                             BrandName = b.Name,
+                             ColorName = co.Name,
+                             DailyPrice = ca.DailyPrice
+                         };
+            return result.ToList();
         }
     }
 }

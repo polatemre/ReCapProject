@@ -1,29 +1,43 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Business.Concrete
 {
     public class CarManager : ICarService
     {
-        readonly ICarDal _carDal;
+        ICarDal _carDal;
+        IRentalService _rentalService; //kullanmadık
 
-        public CarManager(ICarDal carDal)
+        public CarManager(ICarDal carDal, IRentalService rentalService)
         {
             _carDal = carDal;
+            _rentalService = rentalService; //kullanmadık
         }
 
+        [SecuredOperation("admin")]
         [ValidationAspect(typeof(CarValidator))]
         public IResult Add(Car car)
         {
+            IResult result = BusinessRules.Run(
+                CheckIfCarNameExist(car.Description)
+                );
+
+            if (result != null)
+            {
+                return result;
+            }
             _carDal.Add(car);
             return new SuccessResult(Messages.CarAdded);
         }
@@ -46,6 +60,15 @@ namespace Business.Concrete
         public IDataResult<List<Car>> GetCarsByColorId(int id)
         {
             return new SuccessDataResult<List<Car>>(_carDal.GetAll(p => p.ColorId == id));
+        }
+        private IResult CheckIfCarNameExist(string description)
+        {
+            var result = _carDal.GetAll(c => c.Description == description).Any();
+            if (result)
+            {
+                return new ErrorResult(Messages.CarNameAlreadyExist);
+            }
+            return new SuccessResult();
         }
     }
 }

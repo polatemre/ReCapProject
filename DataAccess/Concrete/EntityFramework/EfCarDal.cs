@@ -13,23 +13,30 @@ namespace DataAccess.Concrete.EntityFramework
 {
     public class EfCarDal : EfEntityRepositoryBase<Car, ReCapContext>, ICarDal
     {
-        public List<CarDetailDto> GetCarDetails()
+        public List<CarDetailDto> GetCarDetails(Expression<Func<Car, bool>> filter = null)
         {
-            using ReCapContext context = new ReCapContext();
-            var result = from ca in context.Cars
-                         join b in context.Brands
-                         on ca.BrandId equals b.Id
-                         join co in context.Colors
-                         on ca.ColorId equals co.Id
-                         select new CarDetailDto
-                         {
-                             CarId = ca.Id,
-                             CarName = ca.Description,
-                             BrandName = b.Name,
-                             ColorName = co.Name,
-                             DailyPrice = ca.DailyPrice
-                         };
-            return result.ToList();
+            using (ReCapContext context = new ReCapContext())
+            {
+                var result = from c in filter == null ? context.Cars : context.Cars.Where(filter)
+                             join co in context.Colors
+                             on c.ColorId equals co.Id
+                             join b in context.Brands
+                             on c.BrandId equals b.Id
+                             join ci in context.CarImages
+                             on c.Id equals ci.CarId
+                             select new CarDetailDto
+                             {
+                                 CarId = c.Id,
+                                 BrandName = b.Name,
+                                 ColorName = co.Name,
+                                 DailyPrice = c.DailyPrice,
+                                 Description = c.Description,
+                                 ModelYear = c.ModelYear,
+                                 CarImageDate = ci.CarImageDate,
+                                 ImagePath = ci.ImagePath
+                             };
+                return result.ToList();
+            }
         }
     }
 }

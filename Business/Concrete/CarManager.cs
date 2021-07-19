@@ -14,6 +14,7 @@ using Entities.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Business.Concrete
@@ -21,85 +22,61 @@ namespace Business.Concrete
     public class CarManager : ICarService
     {
         ICarDal _carDal;
-        IRentalService _rentalService; //kullanmadık
 
-        public CarManager(ICarDal carDal, IRentalService rentalService)
+        public CarManager(ICarDal carDal)
         {
             _carDal = carDal;
-            _rentalService = rentalService; //kullanmadık
         }
 
-        [SecuredOperation("admin")]
+        [SecuredOperation("car.add")]
         [ValidationAspect(typeof(CarValidator))]
+        [CacheRemoveAspect("ICarService.Get")]
         public IResult Add(Car car)
         {
-            IResult result = BusinessRules.Run(
-                CheckIfCarNameExist(car.Description)
-                );
-
-            if (result != null)
-            {
-                return result;
-            }
             _carDal.Add(car);
-            return new SuccessResult(Messages.CarAdded);
+            return new SuccessResult(Messages.AddedCar);
+
+        }
+
+        public IResult Delete(Car car)
+        {
+
+            _carDal.Delete(car);
+            return new SuccessResult(Messages.DeletedCar);
+
+        }
+
+        [CacheAspect(duration: 10)]
+        [PerformanceAspect(1)]
+        public IDataResult<List<Car>> GetAll()
+        {
+            return new SuccessDataResult<List<Car>>(_carDal.GetAll());
+        }
+
+        public IDataResult<Car> GetById(int id)
+        {
+            return new SuccessDataResult<Car>(_carDal.Get(c => c.Id == id));
+        }
+
+        public IDataResult<List<CarDetailDto>> GetCarDetails(Expression<Func<Car, bool>> filter = null)
+        {
+            return new SuccessDataResult<List<CarDetailDto>>(_carDal.GetCarDetails(filter));
+
+        }
+
+        [ValidationAspect(typeof(CarValidator))]
+        public IResult Update(Car car)
+        {
+            _carDal.Update(car);
+            return new SuccessResult(Messages.UpdatedCar);
         }
 
         [TransactionScopeAspect]
-        public IResult AddTransactionalTest(Car car)
+        public IResult TransactionalOperation(Car car)
         {
-            Add(car);
-            if (car.DailyPrice < 10)
-            {
-                throw new Exception("");
-            }
-            Add(car);
-
-            return null;
-        }
-
-        [CacheAspect]
-        public IDataResult<List<Car>> GetAll()
-        {
-            return new SuccessDataResult<List<Car>>(_carDal.GetAll(), Messages.CarsListed);
-        }
-
-        public IDataResult<List<CarDetailDto>> GetCarDetails()
-        {
-            return new SuccessDataResult<List<CarDetailDto>>(_carDal.GetCarDetails());
-        }
-
-        [CacheAspect]
-        [PerformanceAspect(5)]
-        public IDataResult<List<Car>> GetCarsByBrandId(int id)
-        {
-            return new SuccessDataResult<List<Car>>(_carDal.GetAll(p => p.BrandId == id));
-        }
-
-        public IDataResult<List<Car>> GetCarsByColorId(int id)
-        {
-            return new SuccessDataResult<List<Car>>(_carDal.GetAll(p => p.ColorId == id));
-        }
-
-        [CacheRemoveAspect("IProductService.Get")]
-        public IResult Update(Car car)
-        {
-            if (CheckIfCarNameExist(car.Description).Success)
-            {
-                _carDal.Update(car);
-                return new SuccessResult(Messages.CarUpdated);
-            }
-            return new ErrorResult();
-        }
-
-        private IResult CheckIfCarNameExist(string description)
-        {
-            var result = _carDal.GetAll(c => c.Description == description).Any();
-            if (result)
-            {
-                return new ErrorResult(Messages.CarNameAlreadyExist);
-            }
-            return new SuccessResult();
+            _carDal.Update(car);
+            _carDal.Add(car);
+            return new SuccessResult(Messages.UpdatedCar);
         }
     }
 }

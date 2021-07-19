@@ -16,11 +16,11 @@ namespace DataAccess.Concrete.InMemory
         public InMemoryCarDal()
         {
             _cars = new List<Car>{
-                new Car{Id=1,BrandId=1,ColorId=1,DailyPrice=1000,Description="asds1",ModelYear=2021 },
-                new Car{Id=2,BrandId=2,ColorId=2,DailyPrice=1200,Description="asds2",ModelYear=2020 },
-                new Car{Id=3,BrandId=3,ColorId=2,DailyPrice=3000,Description="asds3",ModelYear=2019 },
-                new Car{Id=4,BrandId=3,ColorId=3,DailyPrice=1400,Description="asds4",ModelYear=2018 },
-                new Car{Id=5,BrandId=4,ColorId=3,DailyPrice=2400,Description="asds5",ModelYear=2017 }
+                new Car{Id=1,BrandId=1,ColorId=1,DailyPrice=1000,Description="asds1",ModelYear="2021" },
+                new Car{Id=2,BrandId=2,ColorId=2,DailyPrice=1200,Description="asds2",ModelYear="2020" },
+                new Car{Id=3,BrandId=3,ColorId=2,DailyPrice=3000,Description="asds3",ModelYear="2019" },
+                new Car{Id=4,BrandId=3,ColorId=3,DailyPrice=1400,Description="asds4",ModelYear="2018" },
+                new Car{Id=5,BrandId=4,ColorId=3,DailyPrice=2400,Description="asds5",ModelYear="2017" }
             };
         }
 
@@ -56,6 +56,11 @@ namespace DataAccess.Concrete.InMemory
         }
 
         public List<CarDetailDto> GetCarDetails()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<CarDetailDto> GetCarDetails(Expression<Func<Car, bool>> filter = null)
         {
             throw new NotImplementedException();
         }

@@ -24,11 +24,17 @@ namespace Business.Constants
         public static string DeletedCustomer = "Müşteri başarıyla silindi.";
         public static string UpdatedCustomer = "Müşteri başarıyla güncellendi.";
 
-
         public static string AddedUser = "Kullanıcı başarıyla eklendi.";
         public static string DeletedUser = "Kullanıcı başarıyla silindi.";
         public static string UpdatedUser = "Kullanıcı başarıyla güncellendi.";
 
+        public static string AddedCategory = "Kategori başarıyla eklendi.";
+        public static string DeletedCategory = "Kategori başarıyla silindi.";
+        public static string UpdatedCategory = "Kategori başarıyla güncellendi.";
+
+        public static string AddedFuel = "Yakıt tipi başarıyla eklendi.";
+        public static string DeletedFuel = "Yakıt tipi başarıyla silindi.";
+        public static string UpdatedFuel = "Yakıt tipi başarıyla güncellendi.";
 
         public static string AddedRental = "Araba Kiralama işlemi baraşıyla gerçekleşti.";
         public static string DeletedRental = "Araba Kiralama işlemi iptal edildi.";

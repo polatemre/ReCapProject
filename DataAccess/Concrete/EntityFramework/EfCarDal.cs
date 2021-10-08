@@ -22,6 +22,10 @@ namespace DataAccess.Concrete.EntityFramework
                              on c.ColorId equals co.Id
                              join b in context.Brands
                              on c.BrandId equals b.Id
+                             join f in context.Fuels
+                             on c.FuelId equals f.Id
+                             join ca in context.Categories
+                             on c.CategoryId equals ca.Id
                              join ci in context.CarImages
                              on c.Id equals ci.CarId
                              select new CarDetailDto
@@ -29,6 +33,12 @@ namespace DataAccess.Concrete.EntityFramework
                                  CarId = c.Id,
                                  BrandName = b.Name,
                                  ColorName = co.Name,
+                                 FuelType = f.Name,
+                                 CategoryName = ca.Name,
+                                 ModelName = c.ModelName,
+                                 Bag = c.Bag,
+                                 Seat = c.Seat,
+                                 Gear = c.Gear,
                                  DailyPrice = c.DailyPrice,
                                  Description = c.Description,
                                  ModelYear = c.ModelYear,

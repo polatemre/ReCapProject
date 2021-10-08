@@ -1,17 +1,16 @@
-﻿using FluentValidation;
+﻿using Entities.Concrete;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Text;
 
 namespace Business.ValidationRules.FluentValidation
 {
-    public class ColorValidator : AbstractValidator<Color>
+    public class FuelValidator : AbstractValidator<Fuel>
     {
-        public ColorValidator()
+        public FuelValidator()
         {
             RuleFor(c => c.Name).NotEmpty();
-            RuleFor(c => c.Name).MinimumLength(3);
         }
     }
 }

@@ -100,7 +100,6 @@ namespace WebAPI.Controllers
         [HttpGet("getcarbycolor")]
         public IActionResult GetCarByColor(int colorId)
         {
-
             var result = _carService.GetCarDetails(I => I.ColorId == colorId);
             if (result.Success)
             {
@@ -112,8 +111,18 @@ namespace WebAPI.Controllers
         [HttpGet("getcarbybrand")]
         public IActionResult GetCarByBrand(int brandId)
         {
-
             var result = _carService.GetCarDetails(I => I.BrandId == brandId);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
+        [HttpGet("getcarbycategory")]
+        public IActionResult GetCarByCategory(int categoryId)
+        {
+            var result = _carService.GetCarDetails(c => c.CategoryId == categoryId);
             if (result.Success)
             {
                 return Ok(result);
